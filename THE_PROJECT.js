@@ -45,6 +45,7 @@ console.log(`
         6 --> SEARCH FOR A CANDIDATE
         7 --> STATISTICS
         0 --> EXIT
+        (IMPORTANT NOTICE!!!) ==> RESPECT CAPITALISATION!!
     `)
 }
 //--------------------------------------------------------------------------
@@ -58,10 +59,10 @@ let working = true
 while(working)
 {
     showmenu()
-    let num = +ps("choose a number: ")
+    let num = ps("choose a number: ")
 switch (num)
 {
-    case 1:
+    case "1":
         console.log(`
             1 --> add one candidate
             2 --> add multiple candidates
@@ -79,11 +80,11 @@ switch (num)
                 break;
         }
         break;
-    case 2:
+    case "2":
         console.log(`
             1 --> display all candidates
             2 --> sorted display (most votes to least)
-            3 --> filtered display (by name)
+            3 --> filtered display (by political party)
             0 --> return`)
             let affiche = +ps("choose a number: ")
             switch(affiche)
@@ -92,32 +93,33 @@ switch (num)
                 AfficherCandidat()
                 break;
             case 2:
-                console.log(afficherParTri(candidats))
+                console.log(afficherParTri())
                 break;
             case 3:
+                afficherparfilter()
                 break;
             case 0:
                 break;
             }     
         break;
-    case 3:
+    case "3":
         voter()
         break;
-    case 4:
+    case "4":
         modifyCandidate()
         break;
-    case 5:
+    case "5":
         deleteCandidate()
         break;
-    case 6:
+    case "6":
         searchForCandidate()
         break;
-    case 7:
+    case "7":
         statistics()
         break;
-    case 0:
+    case "0":
         working = false;
-        console.log("see ya")
+        console.log("FARWELL")
         break;
     default:
             console.log("invalid option")
@@ -131,7 +133,7 @@ function addOneCandidate()
 {
     let exist = false
     let cin = ps("type the CIN of the candidate you want to add: ")
-    for (i = 0; i < candidats.length; i++)
+    for (let i = 0; i < candidats.length; i++)
     {
         if(candidats[i].cin === cin)
         {
@@ -178,28 +180,38 @@ function AfficherCandidat()
     }
 }
 
-function afficherParTri(tab)
+function afficherParTri()
 {
   let swapped;
   do {
     swapped = false;
-    for (let i = 0; i < tab.length - 1; i++) {
-      if (tab[i].electeurs.length > tab[i + 1].electeurs.length) {
-        let temp = tab[i + 1]
-        tab [i + 1] = tab[i]
-        tab[i] = temp
+    for (let i = 0; i < candidats.length - 1; i++) {
+      if (candidats[i].electeurs.length < candidats[i + 1].electeurs.length) {
+        let temp = candidats[i + 1]
+        candidats[i + 1] = candidats[i]
+        candidats[i] = temp
         swapped = true;
       }
     }
   } while (swapped);
-  return tab.map(candidats => candidats.nom);
+  return candidats.map(candidats => candidats.nom);
 }
 function afficherparfilter()
-{
-    for (i = 0; i < candidats.length; i++)
+{   let verifi = false   
+    let parti = ps(
+        "enter the party you wanna filter with: ").trim()
+    for (let i = 0; i < candidats.length; i++)
     {
-
+            if(candidats[i].partiPolitique === parti)
+                {
+                    console.log(candidats[i].nom + " " + candidats[i].prenom)
+                    verifi = true
+                }
     }
+    if(!verifi)
+    {
+        console.log("a mistake has been made")
+    } 
 }
 //----------------------------------------------------------------------------
 //THE VOTING FUNCTION
@@ -210,7 +222,7 @@ function voter()
     let votebefore = false;
     for(let i = 0; i < candidats.length; i++)
     {
-        for(j = 0; j < candidats[i].electeurs.length; j++)
+        for(let j = 0; j < candidats[i].electeurs.length; j++)
         {
             if(candidats[i].electeurs[j] === cinElecteur)
             {
@@ -225,7 +237,7 @@ function voter()
         return
     }
     let cincandidate = ps("enter the CIN of the candidate you wish to vote for: ").trim()
-    let candidate;
+    let candidate = null;
     for (let i = 0; i < candidats.length; i++)
     {
         if(candidats[i].cin === cincandidate)
@@ -261,9 +273,10 @@ function modifyCandidate()
                 }
                 else if (choice === 2)
                 {
+                    let modifiedAge = +ps("enter new age: ")
                     if(!isNaN(age) && age >= 18)
                         {
-                            candidats[i].age = +ps("enter new age: ")
+                            candidats[i].age = modifiedAge
                             console.log("age updated successfully")
                         }
                         else
@@ -313,7 +326,7 @@ function searchForCandidate()
 {
     canName = ps("enter the name of the candidate you want to search for: ")
     let result = [];
-    for(i = 0; i < candidats.length; i++)
+    for(let i = 0; i < candidats.length; i++)
     {
         if(candidats[i].nom === canName)
         {
@@ -366,5 +379,5 @@ function statistics()
       }
     }
   } while (swapped);
-  console.log("names of top 3 candidates in terms of votes: " + copy.splice(0, 3).map(c => c.nom));
+  console.log("names of top 3 candidates in terms of votes: " + copy.splice(0, 3).map(c => (c.nom + " " + c.prenom)));
 }
